@@ -3,6 +3,7 @@ import mysql.connector
 import hashlib
 import os
 from dotenv import load_dotenv
+from mysql.connector.errors import DatabaseError
 
 app = Flask(__name__)
 
@@ -40,36 +41,91 @@ def index():
 @app.route('/users/create', methods=['POST'])
 def create_user():
     data = request.json
-    hashed_password = hash_password(data['password'])
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    query = "INSERT INTO Users (username, name, password, is_admin) VALUES (%s, %s, %s, %s)"
-    cursor.execute(query, (data['username'], data['name'], hashed_password, data['is_admin']))
-    conn.commit()
-    conn.close()
-    return jsonify({'message': 'User created successfully!'}), 201
+    conn = None
+    try:
+        hashed_password = hash_password(data['password'])
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        query = "INSERT INTO Users (username, name, password, is_admin) VALUES (%s, %s, %s, %s)"
+        cursor.execute(query, (data['username'], data['name'], hashed_password, data['is_admin']))
+        conn.commit()
+        return jsonify({'message': 'User created successfully!'}), 201
+    except DatabaseError as e:
+        if conn:
+            conn.rollback()
+        print(e)
+        error_code = e.args[0]
+        if error_code == 1205: 
+            return jsonify({'error': 'Lock wait timeout exceeded. Please try again later.'}), 500
+        else:
+            return jsonify({'error': f'Database error: {str(e)}'}), 500
+    except Exception as e:
+        if conn:
+            conn.rollback() 
+        return jsonify({'error': f'An unexpected error occurred: {str(e)}'}), 500
+    finally:
+        if conn:
+            conn.close()
 # Create Ticket
 @app.route('/tickets/create', methods=['POST'])
 def create_ticket():
     data = request.json
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    query = "INSERT INTO Tickets (ticket_id, event_title, ticket_price, fee, total_price, quantity, full_section, section, row_num) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-    cursor.execute(query, (data["ticket_id"], data["event_title"], data["ticket_price"], data["fee"], data["total_price"], data["quantity"], data["full_section"], data["section"], data["row_num"]))
-    conn.commit()
-    conn.close()
-    return jsonify({'message': 'Ticket created successfully!'}), 201
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        query = "INSERT INTO Tickets (ticket_id, event_title, ticket_price, fee, total_price, quantity, full_section, section, row_num) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        cursor.execute(query, (data["ticket_id"], data["event_title"], data["ticket_price"], data["fee"], data["total_price"], data["quantity"], data["full_section"], data["section"], data["row_num"]))
+        conn.commit()
+        return jsonify({'message': 'Ticket created successfully!'}), 201
+    except DatabaseError as e:
+        if conn:
+            conn.rollback()
+        print(e)
+        error_code = e.args[0]
+        if error_code == 1205: 
+            return jsonify({'error': 'Lock wait timeout exceeded. Please try again later.'}), 500
+        else:
+            return jsonify({'error': f'Database error: {str(e)}'}), 500
+    except Exception as e:
+        if conn:
+            conn.rollback() 
+        return jsonify({'error': f'An unexpected error occurred: {str(e)}'}), 500
+    finally:
+        if conn:
+            conn.close()
+
 # Create Event
 @app.route('/events/create', methods=['POST'])
 def create_event():
     data = request.json
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    query = "INSERT INTO Events (event_title, event_url, datetime_local, location_name, promoter_name) VALUES (%s, %s, %s, %s, %s)"
-    cursor.execute(query, (data["event_title"], data["event_url"], data["datetime_local"], data["location_name"], data["promoter_name"]))
-    conn.commit()
-    conn.close()
-    return jsonify({'message': 'Event created successfully!'}), 201
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        query = """
+            INSERT INTO Events (event_title, event_url, datetime_local, location_name, promoter_name)
+            VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.execute(query, (data["event_title"], data["event_url"], data["datetime_local"], data["location_name"], data["promoter_name"]))
+        conn.commit()
+        return jsonify({'message': 'Event created successfully!'}), 201
+    except DatabaseError as e:
+        if conn:
+            conn.rollback()  # Instantly remove locks by rolling back the transaction
+        print(e)
+        error_code = e.args[0]
+        if error_code == 1205:  # Lock wait timeout exceeded
+            return jsonify({'error': 'Lock wait timeout exceeded. Please try again later.'}), 500
+        else:
+            return jsonify({'error': f'Database error: {str(e)}'}), 500
+    except Exception as e:
+        if conn:
+            conn.rollback()  # Ensure rollback for any unexpected error
+        return jsonify({'error': f'An unexpected error occurred: {str(e)}'}), 500
+    finally:
+        if conn:
+            conn.close()
 
 # Read Users
 @app.route('/users/records', methods=['GET'])
