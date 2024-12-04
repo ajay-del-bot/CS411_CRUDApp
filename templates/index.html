@@ -10,7 +10,7 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h1>Ticket Masterer</h1>
+        <h1>Ticket Masterer (Admin View)</h1>
         <!-- Navigation Tabs -->
         <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
@@ -24,55 +24,70 @@
             </li>
         </ul>
         
+        <p id="demo"></p>
+
         <div class="tab-content" id="myTabContent">
             <!-- Users Tab -->
             <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="users-tab">
-                <!-- Form to Add a Record -->
-                <form id="createUserForm" class="mb-3">
-                    <input type="text" id="username" placeholder="Username" class="form-control mb-2" required>
-                    <input type="text" id="name" placeholder="Name" class="form-control mb-2" required>
-                    <input type="password" id="password" placeholder="Password" class="form-control mb-2" required>
-                    <select id="is_admin" class="form-control mb-2">
-                        <option value="0">User</option>
-                        <option value="1">Admin</option>
-                    </select>
-                    <button type="submit" class="btn btn-primary">Add User</button>
-                </form>
-
-                <h2>Users</h2>
-                <ul id="usersList" class="list-group"></ul>
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">Add User</h5>
+                        <form id="createUserForm">
+                            <div class="mb-3">
+                                <input type="text" id="username" placeholder="Username" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="text" id="name" placeholder="Name" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="password" id="password" placeholder="Password" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <select id="is_admin" class="form-select">
+                                    <option value="0">User</option>
+                                    <option value="1">Admin</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Add User</button>
+                        </form>
+                    </div>
+                </div>
+                <h3 class="text-primary fw-bold mb-3">User List</h3>
+                <ul id="usersList" class="list-group mb-4 border border-primary rounded"></ul>
 
                 <!-- Update Users Modal -->
                 <div class="modal fade" id="userUpdateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="updateModalLabel">Update User</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content shadow-lg border-0 rounded">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title fw-bold" id="updateModalLabel">Update User</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body bg-light">
                                 <form id="updateUserForm">
                                     <input type="hidden" id="updateUsernameOld">
                                     <div class="mb-3">
-                                        <label for="updateUsernameNew" class="form-label">Username</label>
-                                        <input type="text" id="updateUsernameNew" class="form-control" required>
+                                        <label for="updateUsernameNew" class="form-label fw-semibold">Username</label>
+                                        <input type="text" id="updateUsernameNew" class="form-control border-primary shadow-sm" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="updateName" class="form-label">Name</label>
-                                        <input type="text" id="updateName" class="form-control" required>
+                                        <label for="updateName" class="form-label fw-semibold">Name</label>
+                                        <input type="text" id="updateName" class="form-control border-primary shadow-sm" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="updatePassword" class="form-label">Password</label>
-                                        <input type="password" id="updatePassword" class="form-control">
+                                        <label for="updatePassword" class="form-label fw-semibold">Password</label>
+                                        <input type="password" id="updatePassword" class="form-control border-primary shadow-sm">
                                     </div>
                                     <div class="mb-3">
-                                        <label for="updateis_admin" class="form-label">Type</label>
-                                        <select id="updateis_admin" class="form-control">
+                                        <label for="updateis_admin" class="form-label fw-semibold">Type</label>
+                                        <select id="updateis_admin" class="form-select border-primary shadow-sm">
                                             <option value="0">User</option>
                                             <option value="1">Admin</option>
                                         </select>
                                     </div>
-                                    <button type="submit" class="btn btn-primary">Update User</button>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary btn-lg fw-bold shadow">Update User</button>
+                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -82,66 +97,96 @@
         
             <!-- Tickets Tab -->
             <div class="tab-pane fade" id="tickets" role="tabpanel" aria-labelledby="tickets-tab">
-                <form id="createTicketForm" class="mb-3">
-                    <input type="text" id="createTicketID" placeholder="Ticket ID" class="form-control mb-2" required>
-                    <input type="text" id="createEventTitle" placeholder="Event Title" class="form-control mb-2" required>
-                    <input type="number" id="createTicketPrice" placeholder="Ticket Price" step="01" class="form-control mb-2" required>
-                    <input type="number" id="createFee" placeholder="Fee" step="1" class="form-control mb-2" required>
-                    <input type="number" id="createTotalPrice" placeholder="Total Price" step="1" class="form-control mb-2" required>
-                    <input type="text" id="createFullSection" placeholder="Full Section" class="form-control mb-2" required>
-                    <input type="text" id="createSection" placeholder="Section" class="form-control mb-2" required>
-                    <input type="text" id="createRowNum" placeholder="Row Num" class="form-control mb-2" required>
-                    <input type="number" id="createQuantity" placeholder="Quantity" class="form-control mb-2" required>
-                    <button type="submit" class="btn btn-primary">Add Ticket</button>
-                </form>
-
-                <h2>Tickets</h2>
-                <ul id="ticketsList" class="list-group"></ul>
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">Add Ticket</h5>
+                        <form id="createTicketForm">
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <input type="text" id="createTicketID" placeholder="Ticket ID" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" id="createEventTitle" placeholder="Event Title" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="row g-2 mt-2">
+                                <div class="col-md-4">
+                                    <input type="number" id="createTicketPrice" placeholder="Price" class="form-control" step="0.01" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="number" id="createFee" placeholder="Fee" class="form-control" step="0.01" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="number" id="createTotalPrice" placeholder="Total Price" class="form-control" step="0.01" required>
+                                </div>
+                            </div>
+                            <div class="row g-2 mt-2">
+                                <div class="col-md-4">
+                                    <input type="text" id="createFullSection" placeholder="Full Section" class="form-control" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" id="createSection" placeholder="Section" class="form-control" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" id="createRowNum" placeholder="Row Number" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <input type="number" id="createQuantity" placeholder="Quantity" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 mt-3">Add Ticket</button>
+                        </form>
+                    </div>
+                </div>
+                <h3 class="text-primary fw-bold mb-3">Ticket List</h3>
+                <ul id="ticketsList" class="list-group mb-4 border border-primary rounded"></ul>
 
                 <!-- Update Tickets Modal -->
                 <div class="modal fade" id="ticketUpdateModal" tabindex="-1" aria-labelledby="updateModalTicketsLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="updateModalTicketsLabel">Update Ticket</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content shadow-lg border-0 rounded">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title fw-bold" id="updateModalTicketsLabel">Update Ticket</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body bg-light">
                                 <form id="updateTicketForm">
                                     <input type="hidden" id="updateTicketID">
                                     <div class="mb-3">
-                                        <label for="updateEventTitle" class="form-label">Event Title</label>
-                                        <input type="text" id="updateEventTitle" class="form-control" required>
+                                        <label for="updateEventTitle" class="form-label fw-semibold">Event Title</label>
+                                        <input type="text" id="updateEventTitle" class="form-control border-primary shadow-sm" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="updateTicketPrice" class="form-label">Ticket Price</label>
-                                        <input type="number" id="updateTicketPrice" class="form-control" step="0.01" required>
+                                        <label for="updateTicketPrice" class="form-label fw-semibold">Ticket Price</label>
+                                        <input type="number" id="updateTicketPrice" class="form-control border-primary shadow-sm" step="0.01" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="updateFee" class="form-label">Fee</label>
-                                        <input type="number" id="updateFee" class="form-control" step="0.01" required>
+                                        <label for="updateFee" class="form-label fw-semibold">Fee</label>
+                                        <input type="number" id="updateFee" class="form-control border-primary shadow-sm" step="0.01" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="updateTotalPrice" class="form-label">Total Price</label>
-                                        <input type="number" id="updateTotalPrice" class="form-control" step="0.01" required>
+                                        <label for="updateTotalPrice" class="form-label fw-semibold">Total Price</label>
+                                        <input type="number" id="updateTotalPrice" class="form-control border-primary shadow-sm" step="0.01" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="updateQuantity" class="form-label">Quantity</label>
-                                        <input type="number" id="updateQuantity" class="form-control" required>
+                                        <label for="updateQuantity" class="form-label fw-semibold">Quantity</label>
+                                        <input type="number" id="updateQuantity" class="form-control border-primary shadow-sm" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="updateFullSection" class="form-label">Full Section</label>
-                                        <input type="text" id="updateFullSection" class="form-control">
+                                        <label for="updateFullSection" class="form-label fw-semibold">Full Section</label>
+                                        <input type="text" id="updateFullSection" class="form-control border-primary shadow-sm">
                                     </div>
                                     <div class="mb-3">
-                                        <label for="updateSection" class="form-label">Section</label>
-                                        <input type="text" id="updateSection" class="form-control">
+                                        <label for="updateSection" class="form-label fw-semibold">Section</label>
+                                        <input type="text" id="updateSection" class="form-control border-primary shadow-sm">
                                     </div>
                                     <div class="mb-3">
-                                        <label for="updateRowNum" class="form-label">Row Number</label>
-                                        <input type="text" id="updateRowNum" class="form-control">
+                                        <label for="updateRowNum" class="form-label fw-semibold">Row Number</label>
+                                        <input type="text" id="updateRowNum" class="form-control border-primary shadow-sm">
                                     </div>
-                                    <button type="submit" class="btn btn-primary">Update Ticket</button>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary btn-lg fw-bold shadow">Update Ticket</button>
+                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -152,50 +197,66 @@
 
             <!-- Events Tab -->
             <div class="tab-pane fade" id="events" role="tabpanel" aria-labelledby="events-tab">
-                <form id="createEventForm" class="mb-3">
-                    <input type="text" id="event_title" placeholder="Event Title" class="form-control mb-2" required>
-                    <input type="text" id="event_url" placeholder="Event url" class="form-control mb-2" required>
-                    <input type="datetime-local" id="datetime_local" placeholder="Datetime" class="form-control mb-2" required>
-                    <input type="text" id="location_name" placeholder="Location" class="form-control mb-2" required>
-                    <input type="text" id="promoter_name" placeholder="Promoter" class="form-control mb-2" required>
-                    <button type="submit" class="btn btn-primary">Add Event</button>
-                </form>
-
-                <h2>Events</h2>
-                <ul id="eventsList" class="list-group"></ul>
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">Add Event</h5>
+                        <form id="createEventForm">
+                            <div class="mb-3">
+                                <input type="text" id="event_title" placeholder="Event Title" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="text" id="event_url" placeholder="Event URL" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="datetime-local" id="datetime_local" placeholder="Date & Time" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="text" id="location_name" placeholder="Location" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="text" id="promoter_name" placeholder="Promoter" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Add Event</button>
+                        </form>
+                    </div>
+                </div>
+                <h3 class="text-primary fw-bold mb-3">Event List</h3>
+                <ul id="eventsList" class="list-group mb-4 border border-primary rounded"></ul>
                 
                 <!-- Update Events Modal -->
                 <div class="modal fade" id="eventUpdateModal" tabindex="-1" aria-labelledby="eventUpdateModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="eventUpdateModalLabel">Update Event</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content shadow-lg border-0 rounded">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title fw-bold" id="eventUpdateModalLabel">Update Event</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body bg-light">
                                 <form id="updateEventForm">
                                     <input type="hidden" id="updateEventTitleOld">
                                     <div class="mb-3">
-                                        <label for="updateEventTitleNew" class="form-label">Event Title</label>
-                                        <input type="text" id="updateEventTitleNew" class="form-control" required>
+                                        <label for="updateEventTitleNew" class="form-label fw-semibold">Event Title</label>
+                                        <input type="text" id="updateEventTitleNew" class="form-control border-primary shadow-sm" placeholder="Enter the event title" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="updateEventURL" class="form-label">Event URL</label>
-                                        <input type="url" id="updateEventURL" class="form-control" required>
+                                        <label for="updateEventURL" class="form-label fw-semibold">Event URL</label>
+                                        <input type="url" id="updateEventURL" class="form-control border-primary shadow-sm" placeholder="Enter the event URL" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="updateDatetimeLocal" class="form-label">Date & Time</label>
-                                        <input type="datetime-local" id="updateDatetimeLocal" class="form-control" required>
+                                        <label for="updateDatetimeLocal" class="form-label fw-semibold">Date & Time</label>
+                                        <input type="datetime-local" id="updateDatetimeLocal" class="form-control border-primary shadow-sm" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="updateLocationName" class="form-label">Location Name</label>
-                                        <input type="text" id="updateLocationName" class="form-control" required>
+                                        <label for="updateLocationName" class="form-label fw-semibold">Location Name</label>
+                                        <input type="text" id="updateLocationName" class="form-control border-primary shadow-sm" placeholder="Enter the location name" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="updatePromoterName" class="form-label">Promoter Name</label>
-                                        <input type="text" id="updatePromoterName" class="form-control">
+                                        <label for="updatePromoterName" class="form-label fw-semibold">Promoter Name</label>
+                                        <input type="text" id="updatePromoterName" class="form-control border-primary shadow-sm" placeholder="Enter the promoter name">
                                     </div>
-                                    <button type="submit" class="btn btn-primary">Update Event</button>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary btn-lg fw-bold shadow">Update Event</button>
+                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -208,55 +269,106 @@
     <script>
         // Fetch Users
         async function fetchUsers() {
-            const response = await axios.get('/users/records');
-            const usersList = document.getElementById('usersList');
-            usersList.innerHTML = '';
-            response.data.forEach(record => {
-                const li = document.createElement('li');
-                li.className = 'list-group-item d-flex justify-content-between align-items-center';
-                li.innerHTML = `
-                    ${record.username} - ${record.name} (Admin: ${record.is_admin ? 'Yes' : 'No'})
-                    <div>
-                        <button class="btn btn-sm btn-warning" onclick="showUserUpdateModal('${record.username}', '${record.name}', '${record.is_admin}')">Edit</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteUser('${record.username}')">Delete</button>
-                    </div>`;
-                usersList.appendChild(li);
-            });
-        }
+    const response = await axios.get('/users/records');
+    const usersList = document.getElementById('usersList');
+    usersList.innerHTML = '';
+    
+    response.data.forEach(record => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center shadow-sm p-3 mb-2 bg-light rounded';
+        
+        li.innerHTML = `
+            <div>
+                <span class="fw-bold text-dark">${record.username}</span> - 
+                <span class="text-muted">${record.name}</span>
+                <span class="badge bg-${record.is_admin ? 'success' : 'secondary'} ms-2">${record.is_admin ? 'Admin' : 'User'}</span>
+            </div>
+            <div>
+                <button class="btn btn-sm btn-outline-warning me-2" onclick="showUserUpdateModal('${record.username}', '${record.name}', '${record.is_admin}')">
+                    <i class="bi bi-pencil"></i> Edit
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteUser('${record.username}')">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
+            </div>`;
+        
+        usersList.appendChild(li);
+    });
+}
         // Fetch Tickets
         async function fetchTickets() {
-            const response = await axios.get('/tickets/records');
-            const ticketsList = document.getElementById('ticketsList');
-            ticketsList.innerHTML = '';
-            response.data.forEach(record => {
-                const li = document.createElement('li');
-                li.className = 'list-group-item d-flex justify-content-between align-items-center';
-                li.innerHTML = `
-                    ${record.ticket_id} - ${record.event_title}
-                    <div>
-                        <button class="btn btn-sm btn-warning" onclick="showTicketsUpdateModal('${record.ticket_id}', '${record.event_title}', '${record.ticket_price}', '${record.fee}', '${record.total_price}', '${record.quantity}', '${record.full_section}', '${record.section}', '${record.row_num}')">Edit</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteTicket('${record.ticket_id}')">Delete</button>
-                    </div>`;
-                    ticketsList.appendChild(li);
-            });
-        }
+    const response = await axios.get('/tickets/records');
+    const ticketsList = document.getElementById('ticketsList');
+    ticketsList.innerHTML = '';
+    
+    response.data.forEach(record => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center shadow-sm p-3 mb-2 bg-light rounded';
+        
+        li.innerHTML = `
+            <div>
+                <span class="fw-bold text-dark">${record.event_title}</span> 
+                <small class="text-muted">(ID: ${record.ticket_id})</small>
+            </div>
+            <div>
+                <span class="badge bg-info text-dark me-2">$${parseFloat(record.ticket_price).toFixed(2)}</span>
+                <button class="btn btn-sm btn-outline-warning me-2" onclick="showTicketsUpdateModal(
+                    '${record.ticket_id}', 
+                    '${record.event_title}', 
+                    '${record.ticket_price}', 
+                    '${record.fee}', 
+                    '${record.total_price}', 
+                    '${record.quantity}', 
+                    '${record.full_section}', 
+                    '${record.section}', 
+                    '${record.row_num}'
+                )">
+                    <i class="bi bi-pencil"></i> Edit
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteTicket('${record.ticket_id}')">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
+            </div>`;
+        
+        ticketsList.appendChild(li);
+    });
+}
         // Fetch Events
         async function fetchEvents() {
-            const response = await axios.get('/events/records');
-            const eventsList = document.getElementById('eventsList');
-            eventsList.innerHTML = '';
-            response.data.forEach(record => {
-                const li = document.createElement('li');
-                li.className = 'list-group-item d-flex justify-content-between align-items-center';
-                li.innerHTML = `
-                    ${record.event_title}
-                    <div>
-                        <button class="btn btn-sm btn-warning" onclick="showEventsUpdateModal('${record.event_title}', '${record.event_url}', '${record.datetime_local}', '${record.location_name}', '${record.promoter_name}')">Edit</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteEvent('${record.event_title}')">Delete</button>
-                    </div>`;
-                eventsList.appendChild(li);
-            });
-        }
+    const response = await axios.get('/events/records');
+    const eventsList = document.getElementById('eventsList');
+    eventsList.innerHTML = '';
+    
+    response.data.forEach(record => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center shadow-sm p-3 mb-2 bg-light rounded';
+        
+        li.innerHTML = `
+            <div>
+                <span class="fw-bold text-dark">${record.event_title}</span> 
+                <small class="text-muted d-block">${new Date(record.datetime_local).toLocaleString()} - ${record.location_name}</small>
+            </div>
+            <div>
+                <a href="${record.event_url}" target="_blank" class="btn btn-sm btn-outline-info me-2">
+                    <i class="bi bi-link-45deg"></i> Link
+                </a>
+                <button class="btn btn-sm btn-outline-warning me-2" onclick="showEventsUpdateModal(
+                    '${record.event_title}', 
+                    '${record.event_url}', 
+                    '${record.datetime_local}', 
+                    '${record.location_name}', 
+                    '${record.promoter_name}'
+                )">
+                    <i class="bi bi-pencil"></i> Edit
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteEvent('${record.event_title}')">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
+            </div>`;
+        
+        eventsList.appendChild(li);
+    });
+}
 
         // Create User
         document.getElementById('createUserForm').addEventListener('submit', async (e) => {
@@ -297,7 +409,7 @@
             const location_name = document.getElementById('location_name').value;
             const promoter_name = document.getElementById('promoter_name').value;
             const data = { event_title, event_url, datetime_local, location_name, promoter_name };
-            await axios.post('/events/create', data);
+            const response =  axios.post('/events/create', data);
             document.getElementById('createEventForm').reset();
             fetchEvents();
         });
