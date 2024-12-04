@@ -26,7 +26,6 @@ db_config = {
     'password': GCP_DB_PASSWORD,
     'database': GCP_DB_NAME,
 }
-
 # Connect to MySQL
 def get_db_connection():
     return mysql.connector.connect(**db_config)
