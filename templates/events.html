@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .logout-btn {
+            padding: 10px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .nav {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .nav a {
+            text-decoration: none;
+            color: white;
+            background-color: #007bff;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .nav a:hover {
+            background-color: #0056b3;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .event {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .event-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .event-details {
+            margin: 5px 0;
+        }
+        .wishlist-btn {
+            padding: 8px 12px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Welcome, {{ username }}</h1>
+        <form action="/logout" method="GET">
+            <button class="logout-btn">Logout</button>
+        </form>
+    </div>
+
+    <div class="nav">
+        <a href="/wishlist-page">My Wishlist</a>
+    </div>
+
+    <div class="search-bar">
+        <input 
+            type="text" 
+            id="search-bar" 
+            placeholder="Search events by title..." 
+            oninput="searchEvents()"
+        >
+    </div>
+
+    <div id="events-container">
+        <!-- Events will be populated here -->
+    </div>
+
+    <script>
+        let allEvents = []; // Store all events globally for search functionality
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const eventsContainer = document.getElementById('events-container');
+
+            // Fetch events from the API
+            fetch('http://127.0.0.1:5000/events')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(events => {
+                    allEvents = events; // Save events to the global variable
+                    renderEvents(events);
+                })
+                .catch(error => {
+                    console.error('Error fetching events:', error);
+                    eventsContainer.innerHTML = '<p>Error loading events. Please try again later.</p>';
+                });
+        });
+
+        function renderEvents(events) {
+            const eventsContainer = document.getElementById('events-container');
+            eventsContainer.innerHTML = ''; // Clear existing events
+
+            if (events.length === 0) {
+                eventsContainer.innerHTML = '<p>No events found.</p>';
+                return;
+            }
+
+            events.forEach(event => {
+                const eventDiv = document.createElement('div');
+                eventDiv.classList.add('event');
+
+                eventDiv.innerHTML = `
+                    <p class="event-title">${event.event_title}</p>
+                    <p class="event-details">Date & Time: ${event.datetime_local}</p>
+                    <p class="event-details">Location: ${event.location_name}</p>
+                    <p class="event-details">Promoter: ${event.promoter_name}</p>
+                    <a href="/tickets-page/${encodeURIComponent(event.event_title)}">View Tickets</a>
+                    <button class="wishlist-btn" onclick="addToWishlist('${event.event_title}')">Add to Wishlist</button>
+                `;
+
+                eventsContainer.appendChild(eventDiv);
+            });
+        }
+
+        function searchEvents() {
+            const query = document.getElementById('search-bar').value.toLowerCase();
+            const filteredEvents = allEvents.filter(event =>
+                event.event_title.toLowerCase().includes(query)
+            );
+            renderEvents(filteredEvents);
+        }
+
+        function addToWishlist(eventTitle) {
+            fetch('http://127.0.0.1:5000/wishlist', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ event_title: eventTitle })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to add event to wishlist.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(error => {
+                console.error('Error adding to wishlist:', error);
+                alert('Error adding event to wishlist. Please try again.');
+            });
+        }
+    </script>
+</body>
+</html>

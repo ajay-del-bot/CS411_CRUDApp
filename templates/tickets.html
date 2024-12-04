@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tickets</title>
+    <script>
+        async function fetchTickets() {
+            const eventTitle = document.getElementById('event-title').value;
+            const ticketsContainer = document.getElementById('tickets-container');
+            ticketsContainer.innerHTML = "Loading tickets...";
+
+            try {
+                const response = await fetch(`/tickets/${encodeURIComponent(eventTitle)}`);
+                if (!response.ok) {
+                    ticketsContainer.innerHTML = `Error: ${response.statusText}`;
+                    return;
+                }
+
+                const tickets = await response.json();
+                if (tickets.message) {
+                    ticketsContainer.innerHTML = tickets.message;
+                    return;
+                }
+
+                let ticketsHTML = `
+                <table border="1">
+                    <tr>
+                        <th>Ticket ID</th>
+                        <th>Event Title</th>
+                        <th>Ticket Price</th>
+                        <th>Fee</th>
+                        <th>Total Price</th>
+                        <th>Quantity</th>
+                        <th>Full Section</th>
+                        <th>Section</th>
+                        <th>Row Num</th>
+                    </tr>
+                    `;
+                tickets.forEach(ticket => {
+                    ticketsHTML += `<tr>
+                        <td>${ticket.ticket_id}</td>
+                        <td>${ticket.event_title}</td>
+                        <td>${ticket.ticket_price}</td>
+                        <td>${ticket.fee}</td>
+                        <td>${ticket.total_price}</td>
+                        <td>${ticket.quantity}</td>
+                        <td>${ticket.full_section}</td>
+                        <td>${ticket.section}</td>
+                        <td>${ticket.row_num}</td>
+                    </tr>`;
+                });
+                ticketsHTML += '</table>';
+                ticketsContainer.innerHTML = ticketsHTML;
+            } catch (error) {
+                ticketsContainer.innerHTML = `Error fetching tickets: ${error.message}`;
+            }
+        }
+
+        window.onload = fetchTickets;
+    </script>
+</head>
+<body>
+    <h1>Tickets for "{{ event_title }}"</h1>
+    <input type="hidden" id="event-title" value="{{ event_title }}">
+    <div id="tickets-container"></div>
+</body>
+</html>
