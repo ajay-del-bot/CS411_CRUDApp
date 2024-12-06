@@ -260,20 +260,23 @@
             const startDate = document.getElementById('start-date-filter').value;
             const endDate = document.getElementById('end-date-filter').value;
 
-            const events = activeTab === 'all' ? allEvents :
-                 activeTab === 'major' ? majorCityEvents :
-                 popularEvents;
-                
-            const filteredEvents = events.filter(event => {
-                const matchesQuery = event.event_title.toLowerCase().includes(query);
-                const matchesCity = selectedCity === 'all' || event.city === selectedCity;
-                const eventDate = new Date(event.datetime_local).toISOString().split('T')[0];
-                const matchesDateRange = (startDate === '' || eventDate >= startDate) && 
-                                        (endDate === '' || eventDate <= endDate);
-                return matchesQuery && matchesCity && matchesDateRange;
-            });
-
-            renderEvents(filteredEvents);
+            // Construct the API endpoint URL with query parameters
+            const apiUrl = new URL('/filtered-events', window.location.origin);
+            apiUrl.searchParams.append('query', query);
+            apiUrl.searchParams.append('city', selectedCity);
+            apiUrl.searchParams.append('start_date', startDate);
+            apiUrl.searchParams.append('end_date', endDate);
+            apiUrl.searchParams.append('tab', activeTab);
+            console.log(startDate)
+            // Make an API call to the backend
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(filteredEvents => {
+                    renderEvents(filteredEvents);
+                })
+                .catch(error => {
+                    console.error('Error fetching filtered events:', error);
+                });
         }
 
         function renderEvents(events) {

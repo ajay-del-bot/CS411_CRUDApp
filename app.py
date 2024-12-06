@@ -550,6 +550,72 @@ def top_cities_events():
     finally:
         conn.close()
 
+@app.route('/filtered-events')
+def filtered_events():
+    if 'user' not in session:
+        return jsonify({'error': 'Unauthorized access'}), 401
+    
+    query = request.args.get('query', '').lower()
+    city = request.args.get('city', 'all')
+    start_date = request.args.get('start_date', '')
+    end_date = request.args.get('end_date', '')
+    tab = request.args.get('tab', 'all')
+    
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        if tab == 'popular':
+            cursor.execute("CALL GetPopularEvents(10)")
+            events = cursor.fetchall()
+        else:
+            sql_query = """
+            SELECT event_title, datetime_local, location_name, promoter_name, city 
+            FROM Events 
+            NATURAL JOIN Locations 
+            WHERE LOWER(event_title) LIKE %s
+            """
+            params = [f'%{query}%']
+            if city != 'all':
+                sql_query += " AND city = %s"
+                params.append(city)
+            
+            if start_date:
+                sql_query += " AND datetime_local >= %s"
+                params.append(start_date)
+            
+            if end_date:
+                sql_query += " AND datetime_local <= %s"
+                params.append(end_date)
+            
+            if tab == 'major':
+                sql_query += """ AND city in ( Select city from 
+                    (select city, count(event_title) from Locations natural join Events group by city order by 2 desc limit 5) z
+                    )"""
+            
+            sql_query += " LIMIT 150"
+            
+            cursor.execute(sql_query, tuple(params))
+            events = cursor.fetchall()
+        
+        # Apply client-side filtering for the popular tab
+        if tab == 'popular':
+            events = [event for event in events if
+                      (city == 'all' or event['city'] == city) and
+                      (not start_date or str(event['datetime_local']) >= start_date) and
+                      (not end_date or str(event['datetime_local']) <= end_date) and
+                      query in event['event_title'].lower()]
+        
+        return jsonify(events)
+    except Exception as e:
+        print(e)
+        return jsonify({'error': f'An error occurred while fetching events: {str(e)}'}), 500
+    finally:
+        if conn:
+            conn.close()
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
