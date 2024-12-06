@@ -6,123 +6,275 @@
     <title>Events</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .header h1 {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            display: flex;
         }
-        .logout-btn {
-            padding: 10px;
-            background-color: red;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: #2c3e50;
+            padding: 20px;
+            box-sizing: border-box;
+            position: fixed;
         }
+
+        .sidebar h1 {
+            color: #ecf0f1;
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+
         .nav {
             display: flex;
+            flex-direction: column;
             gap: 15px;
-            margin-bottom: 20px;
         }
+
         .nav a {
             text-decoration: none;
-            color: white;
-            background-color: #007bff;
+            color: #ecf0f1;
             padding: 10px 15px;
             border-radius: 5px;
-            font-size: 14px;
-        }
-        .nav a:hover {
-            background-color: #0056b3;
-        }
-        .search-bar {
-            margin-bottom: 20px;
-        }
-        .search-bar input {
-            width: 100%;
-            padding: 10px;
             font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            transition: background-color 0.3s;
         }
-        .event {
-            border: 1px solid #ccc;
+
+        .nav a:hover {
+            background-color: #34495e;
+        }
+
+        .logout-btn {
+            margin-top: 20px;
             padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-        .event-title {
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .event-details {
-            margin: 5px 0;
-        }
-        .wishlist-btn {
-            padding: 8px 12px;
-            background-color: green;
+            background-color: #e74c3c;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+        }
+
+        .filter-container, .search-bar {
+            margin-bottom: 20px;
+        }
+
+        .search-bar input, .filter-container select, .filter-container input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .filter-container label {
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        #events-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .event {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .event:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .event-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+
+        .event-details {
+            margin: 10px 0;
+            font-size: 14px;
+            color: #34495e;
+        }
+
+        .event-details span {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .wishlist-btn {
+            padding: 8px 12px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .wishlist-btn:hover {
+            background-color: #27ae60;
         }
     </style>
 </head>
 <body>
-    <div class="header">
+    <div class="sidebar">
         <h1>Welcome, {{ username }}</h1>
+        <div class="nav">
+            <a href="#" id="all-events-tab">All Events</a>
+            <a href="#" id="major-city-events-tab">Major Events</a>
+            <a href="#" id="popular-events-tab">Popular Events</a>
+            <a href="/wishlist-page">My Wishlist</a>
+        </div>
         <form action="/logout" method="GET">
             <button class="logout-btn">Logout</button>
         </form>
     </div>
 
-    <div class="nav">
-        <a href="/wishlist-page">My Wishlist</a>
-    </div>
-
-    <div class="search-bar">
-        <input 
-            type="text" 
-            id="search-bar" 
-            placeholder="Search events by title..." 
-            oninput="searchEvents()"
-        >
-    </div>
-
-    <div id="events-container">
-        <!-- Events will be populated here -->
+    <div class="main-content">
+        <div class="filter-container">
+            <label for="city-filter">Filter by City:</label>
+            <select id="city-filter" onchange="updateFilters()">
+                <option value="all">All Cities</option>
+            </select>
+            <label for="start-date-filter">From:</label>
+            <input type="date" id="start-date-filter" onchange="updateFilters()">
+            <label for="end-date-filter">To:</label>
+            <input type="date" id="end-date-filter" onchange="updateFilters()">
+        </div>
+        <div class="search-bar">
+            <input type="text" id="search-bar" placeholder="Search events by title..." oninput="updateFilters()">
+        </div>
+        <div id="events-container">
+            <!-- Events will be populated here -->
+        </div>
     </div>
 
     <script>
-        let allEvents = []; // Store all events globally for search functionality
+        let allEvents = []; // Store all events globally
+        let majorCityEvents = []; // Store major city events globally
+        let allCities = []; // Store all cities globally
+        let majorCities = []; // Store major cities globally
+        let activeTab = 'all'; // Tracks active tab
+        let popularEvents = []; // Store popular events globally
 
         document.addEventListener('DOMContentLoaded', () => {
-            const eventsContainer = document.getElementById('events-container');
+            const allEventsTab = document.getElementById('all-events-tab');
+            const majorCityEventsTab = document.getElementById('major-city-events-tab');
+            const popularEventsTab = document.getElementById('popular-events-tab');
 
-            // Fetch events from the API
+            // Fetch all events
             fetch('http://127.0.0.1:5000/events')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(events => {
-                    allEvents = events; // Save events to the global variable
-                    renderEvents(events);
+                    allEvents = events;
+                    allCities = [...new Set(events.map(event => event.city))];
+                    populateCityFilter(allCities);
+                    renderFilteredEvents();
                 })
                 .catch(error => {
                     console.error('Error fetching events:', error);
-                    eventsContainer.innerHTML = '<p>Error loading events. Please try again later.</p>';
                 });
+
+            // Fetch popular events
+            fetch('http://127.0.0.1:5000/popular-events')
+                .then(response => response.json())
+                .then(events => {
+                popularEvents = events;
+                })
+                .catch(error => {
+                console.error('Error fetching popular events:', error);
+                });
+
+            // Fetch major city events
+            fetch('http://127.0.0.1:5000/top-cities-events')
+                .then(response => response.json())
+                .then(events => {
+                    majorCityEvents = events;
+                    majorCities = [...new Set(events.map(event => event.city))];
+                })
+                .catch(error => {
+                    console.error('Error fetching major city events:', error);
+                });
+
+            // Tab click handlers
+            allEventsTab.addEventListener('click', (e) => {
+                e.preventDefault();
+                activeTab = 'all';
+                populateCityFilter(allCities);
+                renderFilteredEvents();
+            });
+
+            popularEventsTab.addEventListener('click', (e) => {
+            e.preventDefault();
+            activeTab = 'popular';
+            renderFilteredEvents();
+            });
+
+            majorCityEventsTab.addEventListener('click', (e) => {
+                e.preventDefault();
+                activeTab = 'major';
+                populateCityFilter(majorCities);
+                renderFilteredEvents();
+            });
         });
+
+        function populateCityFilter(cities) {
+            const cityFilter = document.getElementById('city-filter');
+            cityFilter.innerHTML = '<option value="all">All Cities</option>';
+            cities.forEach(city => {
+                const option = document.createElement('option');
+                option.value = city;
+                option.textContent = city;
+                cityFilter.appendChild(option);
+            });
+        }
+
+        function updateFilters() {
+            renderFilteredEvents();
+        }
+
+        function renderFilteredEvents() {
+            const query = document.getElementById('search-bar').value.toLowerCase();
+            const selectedCity = document.getElementById('city-filter').value;
+            const startDate = document.getElementById('start-date-filter').value;
+            const endDate = document.getElementById('end-date-filter').value;
+
+            const events = activeTab === 'all' ? allEvents :
+                 activeTab === 'major' ? majorCityEvents :
+                 popularEvents;
+                
+            const filteredEvents = events.filter(event => {
+                const matchesQuery = event.event_title.toLowerCase().includes(query);
+                const matchesCity = selectedCity === 'all' || event.city === selectedCity;
+                const eventDate = new Date(event.datetime_local).toISOString().split('T')[0];
+                const matchesDateRange = (startDate === '' || eventDate >= startDate) && 
+                                        (endDate === '' || eventDate <= endDate);
+                return matchesQuery && matchesCity && matchesDateRange;
+            });
+
+            renderEvents(filteredEvents);
+        }
 
         function renderEvents(events) {
             const eventsContainer = document.getElementById('events-container');
@@ -136,26 +288,19 @@
             events.forEach(event => {
                 const eventDiv = document.createElement('div');
                 eventDiv.classList.add('event');
-
                 eventDiv.innerHTML = `
-                    <p class="event-title">${event.event_title}</p>
-                    <p class="event-details">Date & Time: ${event.datetime_local}</p>
-                    <p class="event-details">Location: ${event.location_name}</p>
-                    <p class="event-details">Promoter: ${event.promoter_name}</p>
-                    <a href="/tickets-page/${encodeURIComponent(event.event_title)}">View Tickets</a>
-                    <button class="wishlist-btn" onclick="addToWishlist('${event.event_title}')">Add to Wishlist</button>
+                <p class="event-title">${event.event_title}</p>
+                <p class="event-details"><span>Date & Time:</span> ${event.datetime_local}</p>
+                <p class="event-details"><span>Location:</span> ${event.location_name}</p>
+                <p class="event-details"><span>City:</span> ${event.city || 'N/A'}</p>
+                <p class="event-details"><span>Promoter:</span> ${event.promoter_name}</p>
+                ${event.number_of_tickets ? `<p class="event-details"><span>Available Tickets:</span> ${event.number_of_tickets}</p>` : ''}
+                ${event.wishlist_count ? `<p class="event-details"><span>Wishlist Count:</span> ${event.wishlist_count}</p>` : ''}
+                <a href="/tickets-page/${encodeURIComponent(event.event_title)}">View Tickets</a>
+                <button class="wishlist-btn" onclick="addToWishlist('${event.event_title}')">Add to Wishlist</button>
                 `;
-
                 eventsContainer.appendChild(eventDiv);
             });
-        }
-
-        function searchEvents() {
-            const query = document.getElementById('search-bar').value.toLowerCase();
-            const filteredEvents = allEvents.filter(event =>
-                event.event_title.toLowerCase().includes(query)
-            );
-            renderEvents(filteredEvents);
         }
 
         function addToWishlist(eventTitle) {
@@ -166,18 +311,12 @@
                 },
                 body: JSON.stringify({ event_title: eventTitle })
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to add event to wishlist.');
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 alert(data.message);
             })
             .catch(error => {
                 console.error('Error adding to wishlist:', error);
-                alert('Error adding event to wishlist. Please try again.');
             });
         }
     </script>

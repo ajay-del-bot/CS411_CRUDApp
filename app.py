@@ -293,7 +293,7 @@ def view_events():
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT event_title, datetime_local, location_name, promoter_name FROM Events LIMIT 10")
+        cursor.execute("SELECT event_title, datetime_local, location_name, promoter_name, city FROM Events natural join Locations LIMIT 150")
         events = cursor.fetchall()
         return jsonify(events)
     except Exception as e:
@@ -338,7 +338,7 @@ def view_tickets_by_title(event_title):
         cursor = conn.cursor(dictionary=True)
 
         query = """
-        SELECT t.*
+        SELECT distinct t.section, t.row_num, t.quantity, t.total_price
         FROM Tickets t
         WHERE t.event_title = %s
         """
@@ -500,6 +500,53 @@ def remove_from_wishlist():
     except Exception as e:
         print(e)
         return jsonify({'error': f'Error removing event: {str(e)}'}), 500
+    finally:
+        conn.close()
+
+@app.route('/popular-events')
+def get_popular_events():
+    if 'user' not in session:
+        return jsonify({'error': 'Unauthorized access'}), 401
+    
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("CALL GetPopularEvents(10)")
+        popular_events = cursor.fetchall()
+        return jsonify(popular_events)
+    except Exception as e:
+        print(e)
+        return jsonify({'error': f'An error occurred while fetching popular events: {str(e)}'}), 500
+    finally:
+        if conn:
+            conn.close()
+
+@app.route('/top-cities-events')
+def top_cities_events():
+    """Fetch events happening in the top 5 major cities."""
+    if 'user' not in session:
+        return jsonify({'error': 'Unauthorized access'}), 401
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # Define major cities. You can also query the database for top cities dynamically if needed.
+   
+    try:
+        # Query events happening in the top 5 major cities
+        query = """
+            Select distinct event_title, datetime_local, location_name, promoter_name, city from Tickets natural join Events natural join Locations 
+            where city in ( Select city from 
+            (select city, count(event_title) from Locations natural join Events group by city order by 2 desc limit 5) z
+            );
+            """
+        cursor.execute(query)
+        events = cursor.fetchall()
+        return jsonify(events)
+    except Exception as e:
+        print(e)
+        return jsonify({'error': f'An error occurred: {str(e)}'}), 500
     finally:
         conn.close()
 
