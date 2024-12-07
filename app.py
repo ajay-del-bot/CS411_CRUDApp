@@ -11,12 +11,18 @@ app = Flask(__name__)
 load_dotenv()
 
 # Access environment variables as if they came from the actual environment
-GCP_DB_HOST = os.getenv('GCP_DB_HOST')
-GCP_DB_USER = os.getenv('GCP_DB_USER')
-GCP_DB_PASSWORD = os.getenv('GCP_DB_PASSWORD')
-GCP_DB_NAME = os.getenv('GCP_DB_NAME')
-APP_SECRET_KEY = os.getenv('APP_SECRET_KEY')
+# GCP_DB_HOST = os.getenv('GCP_DB_HOST')
+# GCP_DB_USER = os.getenv('GCP_DB_USER')
+# GCP_DB_PASSWORD = os.getenv('GCP_DB_PASSWORD')
+# GCP_DB_NAME = os.getenv('GCP_DB_NAME')
+# APP_SECRET_KEY = os.getenv('APP_SECRET_KEY')
 # Database configuration from environment variables
+
+GCP_DB_HOST = "35.188.8.169"
+GCP_DB_USER = "root"
+GCP_DB_PASSWORD = ""
+GCP_DB_NAME = "ticket_masterer"
+APP_SECRET_KEY = "123456"
 
 app.secret_key = APP_SECRET_KEY
 
@@ -358,7 +364,7 @@ def tickets_page(event_title):
     """Serve the tickets.html page for a specific event."""
     return render_template('tickets.html', event_title=event_title)
 
-#Login
+# Login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """Login page logic."""
@@ -396,7 +402,7 @@ def login():
 
     return render_template('login.html')
 
-#Logout
+# Logout
 @app.route('/logout')
 def logout():
     """Log the user out."""
@@ -651,5 +657,3 @@ def get_notifications():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
