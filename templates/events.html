@@ -6,7 +6,7 @@
     <title>Events</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Arial', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f0f2f5;
@@ -16,16 +16,21 @@
         .sidebar {
             width: 250px;
             height: 100vh;
-            background-color: #2c3e50;
+            background-color: #083fa7;
             padding: 20px;
             box-sizing: border-box;
             position: fixed;
+            font-family: 'Arial';
         }
 
         .sidebar h1 {
             color: #ecf0f1;
             font-size: 24px;
             margin-bottom: 30px;
+        }
+
+        .city_dropdown {
+            background-color: white;
         }
 
         .nav {
@@ -50,12 +55,13 @@
         .logout-btn {
             margin-top: 20px;
             padding: 10px;
-            background-color: #e74c3c;
+            background-color: #3498db;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
+            font-family: 'Arial';
         }
 
         .logout-btn:hover {
@@ -68,11 +74,45 @@
             width: calc(100% - 250px);
         }
 
-        .filter-container, .search-bar {
+        .filter-container {
+            background-color: white;
+            border-radius: 5px;
+            height: 40px;
+            width: calc(100% - 30px);
+            display: flex;
+            align-items: center;
+            padding: 15px 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
             margin-bottom: 20px;
         }
 
-        .search-bar input, .filter-container select, .filter-container input {
+        .filter-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        #search-bar {
+            flex-grow: 1;
+            background-color: white;
+            border-radius: 5px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            padding: 15px 10px;
+            flex: 1;
+            width: auto;
+            box-sizing: border-box;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .search-bar:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .search-bar input,
+        .filter-container select,
+        .filter-container input {
             padding: 10px;
             font-size: 16px;
             border: 1px solid #bdc3c7;
@@ -80,8 +120,10 @@
             margin-right: 10px;
         }
 
-        .filter-container label {
-            font-size: 16px;
+
+
+        .filter-container label.city-filter {
+            font-weight: bold;
             margin-right: 10px;
         }
 
@@ -124,7 +166,7 @@
 
         .wishlist-btn {
             padding: 8px 12px;
-            background-color: #2ecc71;
+            background-color: #083fa7;
             color: white;
             border: none;
             border-radius: 5px;
@@ -133,7 +175,21 @@
         }
 
         .wishlist-btn:hover {
-            background-color: #27ae60;
+            background-color: #083fa7;
+        }
+
+        .viewtickets-btn {
+            padding: 8px 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .viewtickets-btn:hover {
+            background-color: #3498db;
         }
     </style>
 </head>
@@ -154,16 +210,14 @@
     <div class="main-content">
         <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;"></div>
         <div class="filter-container">
-            <label for="city-filter">Filter by City:</label>
-            <select id="city-filter" onchange="updateFilters()">
+            <label class="city-filter">Filter by City:</label>
+            <select class="city_dropdown" id="city-filter" onchange="updateFilters()">
                 <option value="all">All Cities</option>
             </select>
-            <label for="start-date-filter">From:</label>
+            <label class="city-filter" for="start-date-filter">From:</label>
             <input type="date" id="start-date-filter" onchange="updateFilters()">
-            <label for="end-date-filter">To:</label>
+            <label class="city-filter" for="end-date-filter">To:</label>
             <input type="date" id="end-date-filter" onchange="updateFilters()">
-        </div>
-        <div class="search-bar">
             <input type="text" id="search-bar" placeholder="Search events by title..." oninput="updateFilters()">
         </div>
         <div id="events-container">
@@ -182,9 +236,9 @@
 
         document.addEventListener('DOMContentLoaded', () => {
 
-            {% if check_notifications %}
-            fetchNotifications();
-            {% endif %}
+            // {% if check_notifications %}
+            // fetchNotifications();
+            // {% endif %}
 
             const allEventsTab = document.getElementById('all-events-tab');
             const majorCityEventsTab = document.getElementById('major-city-events-tab');

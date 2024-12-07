@@ -5,8 +5,13 @@ import os
 from dotenv import load_dotenv
 from mysql.connector.errors import DatabaseError
 from datetime import datetime
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
+
+# Configure FLASK_DEBUG from environment variable
+app.config['DEBUG'] = os.environ.get('FLASK_DEBUG')
 
 load_dotenv()
 
@@ -530,8 +535,6 @@ def top_cities_events():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Define major cities. You can also query the database for top cities dynamically if needed.
-   
     try:
         # Query events happening in the top 5 major cities
         query = """
@@ -650,6 +653,6 @@ def get_notifications():
             conn.close()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
 
 
