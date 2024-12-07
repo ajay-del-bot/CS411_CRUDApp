@@ -11,18 +11,18 @@ app = Flask(__name__)
 load_dotenv()
 
 # Access environment variables as if they came from the actual environment
-# GCP_DB_HOST = os.getenv('GCP_DB_HOST')
-# GCP_DB_USER = os.getenv('GCP_DB_USER')
-# GCP_DB_PASSWORD = os.getenv('GCP_DB_PASSWORD')
-# GCP_DB_NAME = os.getenv('GCP_DB_NAME')
-# APP_SECRET_KEY = os.getenv('APP_SECRET_KEY')
+GCP_DB_HOST = os.getenv('GCP_DB_HOST')
+GCP_DB_USER = os.getenv('GCP_DB_USER')
+GCP_DB_PASSWORD = os.getenv('GCP_DB_PASSWORD')
+GCP_DB_NAME = os.getenv('GCP_DB_NAME')
+APP_SECRET_KEY = os.getenv('APP_SECRET_KEY')
 # Database configuration from environment variables
 
-GCP_DB_HOST = "35.188.8.169"
-GCP_DB_USER = "root"
-GCP_DB_PASSWORD = ""
-GCP_DB_NAME = "ticket_masterer"
-APP_SECRET_KEY = "123456"
+# GCP_DB_HOST = "35.188.8.169"
+# GCP_DB_USER = "root"
+# GCP_DB_PASSWORD = ""
+# GCP_DB_NAME = "ticket_masterer"
+# APP_SECRET_KEY = "123456"
 
 app.secret_key = APP_SECRET_KEY
 
