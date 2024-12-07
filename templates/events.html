@@ -160,7 +160,7 @@
             </select>
             <label for="start-date-filter">From:</label>
             <input type="date" id="start-date-filter" onchange="updateFilters()">
-            <label for="end-date-filter">To:</label>
+            <label class="view tickets" for="end-date-filter">To:</label>
             <input type="date" id="end-date-filter" onchange="updateFilters()">
         </div>
         <div class="search-bar">
@@ -182,9 +182,9 @@
 
         document.addEventListener('DOMContentLoaded', () => {
 
-            {% if check_notifications %}
-            fetchNotifications();
-            {% endif %}
+            // {% if check_notifications %}
+            // fetchNotifications();
+            // {% endif %}
 
             const allEventsTab = document.getElementById('all-events-tab');
             const majorCityEventsTab = document.getElementById('major-city-events-tab');
