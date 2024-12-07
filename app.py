@@ -305,10 +305,9 @@ def view_events():
 
 @app.route('/events-page')
 def events_page():
-    """Render the events page for logged-in users."""
     if 'user' not in session:
         return redirect(url_for('login'))
-    return render_template('events.html', username=session['user'])
+    return render_template('events.html', username=session['user'], check_notifications=True)
 
 # Not Used
 @app.route('/tickets')
@@ -611,6 +610,41 @@ def filtered_events():
     except Exception as e:
         print(e)
         return jsonify({'error': f'An error occurred while fetching events: {str(e)}'}), 500
+    finally:
+        if conn:
+            conn.close()
+
+@app.route('/get_notifications')
+def get_notifications():
+    if 'user' not in session:
+        return jsonify({'error': 'Unauthorized access'}), 401
+    
+    username = session['user']
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Fetch unread notifications
+        cursor.execute("""
+            SELECT notification_id, message FROM Notifications 
+            WHERE username = %s AND is_read = 0
+        """, (username,))
+        notifications = cursor.fetchall()
+        
+        # Mark notifications as read
+        if notifications:
+            cursor.execute("""
+                UPDATE Notifications 
+                SET is_read = 1 
+                WHERE username = %s AND is_read = 0
+            """, (username,))
+            conn.commit()
+        
+        return jsonify(notifications)
+    except Exception as e:
+        print(e)
+        return jsonify({'error': f'An error occurred: {str(e)}'}), 500
     finally:
         if conn:
             conn.close()
