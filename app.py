@@ -283,12 +283,57 @@ def delete_ticket(ticket_id):
 # Delete Event
 @app.route('/events/delete/<event_title>', methods=['DELETE'])
 def delete_event(event_title):
+
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM Events WHERE event_title = %s", (event_title,))
-    conn.commit()
-    conn.close()
-    return jsonify({'message': 'Event deleted successfully!'})
+
+    try:
+        # Set isolation level
+        cursor.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")
+
+        # Start transaction
+        conn.start_transaction()
+        
+
+        # Insert the new wishlist entry
+        cursor.execute("""
+                    INSERT INTO Notifications (username, event_title, message)
+                    SELECT 
+                        w.username,
+                        e.event_title,
+                        CONCAT('The event "', e.event_title,
+                            ' at ', l.location_name, ' (', l.city, ', ', l.state, ') ',
+                            'has been cancelled. ',
+                            'There are ', other_events.event_count, ' other events happening in ', l.city, '. ',
+                            'Check them out!') AS message
+                    FROM WishList w
+                    JOIN Events e ON w.event_title = e.event_title
+                    JOIN Locations l ON e.location_name = l.location_name
+                    JOIN (
+                        SELECT city, COUNT(*) as event_count
+                        FROM Events natural join Locations
+                        WHERE event_title != %s
+                        GROUP BY city
+                    ) other_events ON l.city = other_events.city
+                    WHERE e.event_title = %s;
+        """, (event_title, event_title))
+
+        # Insert notification
+        cursor.execute("""
+                    DELETE FROM Events
+                    WHERE event_title = %s;
+        """, (event_title,))
+
+        # Commit the transaction
+        conn.commit()
+        return jsonify({'message': 'Event deleted successfully!'}), 200
+    except Exception as e:
+        conn.rollback()
+        print(e)
+        return jsonify({'error': f'An error occurred: {str(e)}'}), 500
+    finally:
+        cursor.close()
+        conn.close()
 
 # ----------------------------------------------------------------------------------
 @app.route('/events')
@@ -433,21 +478,50 @@ def add_to_wishlist():
 
     try:
         wishlist_date = datetime.now()
-        cursor.execute(
-            """
+        
+        # Set isolation level
+        cursor.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")
+
+        # Start transaction
+        conn.start_transaction()
+        
+
+        # Insert the new wishlist entry
+        cursor.execute("""
             INSERT INTO WishList (username, event_title, wishlist_date)
             VALUES (%s, %s, %s)
             ON DUPLICATE KEY UPDATE wishlist_date = VALUES(wishlist_date)
-            """,
-            (username, event_title, wishlist_date),
-        )
+        """, (username, event_title, wishlist_date))
+
+        # Insert notification
+        cursor.execute("""
+            INSERT INTO Notifications (username, event_title, message)
+            SELECT 
+                %s,
+                e.event_title,
+                CONCAT('You have added "', e.event_title, '" to your wishlist. ',
+                    ' at ', e.location_name, ' (', l.city, ', ', l.state, '). ',
+                    'Promoted by ', e.promoter_name, '. ',
+                    'Currently, ', COUNT(w.username), ' user(s) have wishlisted this event, ',
+                    'including you. ')
+            FROM Events e
+            JOIN Locations l ON e.location_name = l.location_name
+            LEFT JOIN WishList w ON e.event_title = w.event_title
+            WHERE e.event_title = %s
+            GROUP BY e.event_title, e.location_name, l.city, l.state, e.promoter_name
+        """, (username, event_title))
+
+        # Commit the transaction
         conn.commit()
         return jsonify({'message': 'Event added to wishlist successfully'}), 200
     except Exception as e:
+        conn.rollback()
         print(e)
         return jsonify({'error': f'An error occurred: {str(e)}'}), 500
     finally:
+        cursor.close()
         conn.close()
+
 
 @app.route('/wishlist', methods=['GET'])
 def fetch_wishlist():

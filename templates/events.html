@@ -236,9 +236,9 @@
 
         document.addEventListener('DOMContentLoaded', () => {
 
-            // {% if check_notifications %}
-            // fetchNotifications();
-            // {% endif %}
+            {% if check_notifications %}
+            fetchNotifications();
+            {% endif %}
 
             const allEventsTab = document.getElementById('all-events-tab');
             const majorCityEventsTab = document.getElementById('major-city-events-tab');
@@ -378,10 +378,14 @@
             .then(response => response.json())
             .then(data => {
                 alert(data.message);
+                {% if check_notifications %}
+                fetchNotifications();
+                {% endif %}
             })
             .catch(error => {
                 console.error('Error adding to wishlist:', error);
             });
+            
         }
         
         function fetchNotifications() {
