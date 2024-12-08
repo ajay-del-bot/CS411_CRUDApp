@@ -612,10 +612,7 @@ def top_cities_events():
     try:
         # Query events happening in the top 5 major cities
         query = """
-            Select distinct event_title, datetime_local, location_name, promoter_name, city from Tickets natural join Events natural join Locations 
-            where city in ( Select city from 
-            (select city, count(event_title) from Locations natural join Events group by city order by 2 desc limit 5) z
-            );
+            call GetTopCitiesEvents(10);
             """
         cursor.execute(query)
         events = cursor.fetchall()
